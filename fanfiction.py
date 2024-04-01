@@ -2,6 +2,8 @@ import csv
 import os  
 import fnmatch  
 import pandas as pd
+from pandas import *
+import operator
 
 def txtToCSV():
     # Creates and cleans the fanfiction txt files from fanfic-pack directory
@@ -28,9 +30,31 @@ def txtToCSV():
             writer.writerow(file_info)
             file.close()
 
+def getGenres(filename):
+    genresRanked = {}
+    genresDict = {}
+    fanfictions = read_csv(filename)
+    genres = fanfictions['Genre'].to_list()
+    # print(genres)
+    for g in genres:
+        g = str(g)
+        words = g.split(', ')
+        for w in words:
+            w = w.strip()
+            if w in genresDict.keys():
+                genresDict[w] += 1
+            else:
+                genresDict[w] = 1 
+    genresRanked = sorted(genresDict.items(), key= operator.itemgetter(1), reverse = True)
+    return genresRanked[:20]
+
+
+
+
 def main():
     # creates and fills the Fanfictions.csv file
-    # txtToCSV() -- called already
+    # txtToCSV() # called already
+    print(getGenres("Fanfictions.csv"))
 
 
 if __name__ == "__main__":
