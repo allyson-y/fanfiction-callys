@@ -66,10 +66,20 @@ def getGenres(csv):
 def getSummaries(csv, topGenres):
     topSummaries = []
     summaries = csv['Summary'].to_list()
-    genres = csv['Genre'].to_list()
+    genresTog = csv['Genre'].to_list()
+    genresSep = []
+    for g in genresTog:
+        if ',' in g:
+            words = g.split()
+            for w in words:
+                w = w.strip()
+                genresSep.append(w)
+        else:
+            g = g.strip()
+            genresSep.append(g)
     for i in range(0, len(genres)):
         for g in topGenres:
-            if genres[i] == g:
+            if genresSep[i] == g:
                 topSummaries.append(summaries[i])
     return topSummaries
 
