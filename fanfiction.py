@@ -61,7 +61,7 @@ def getGenres(csv):
                 genresDict[w] = 1 
     genresRanked = sorted(genresDict.items(), key= operator.itemgetter(1), reverse = True)
     topGenres = genresRanked[:20]
-    return topGenres.keys
+    return topGenres.keys()
 
 def classify(docs, cats):
     # Loading in features using a shortcut (CountVectorizer and TfidfVectorizer are both useful for quickly creating lexical features)
