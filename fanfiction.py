@@ -63,6 +63,16 @@ def getGenres(csv):
     topGenres = genresRanked[:20]
     return topGenres.keys()
 
+def getSummaries(csv, topGenres):
+    topSummaries = []
+    summaries = csv['Summary'].to_list()
+    genres = csv['Genre'].to_list()
+    for i in range(0, len(genres)):
+        for g in topGenres:
+            if genres[i] == g:
+                topSummaries.append(summaries[i])
+    return topSummaries
+
 def classify(docs, cats):
     # Loading in features using a shortcut (CountVectorizer and TfidfVectorizer are both useful for quickly creating lexical features)
     cv = CountVectorizer(min_df=10, max_df=0.4) # words must show up in at least 5 and no more than 40% of documents
