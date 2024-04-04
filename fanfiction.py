@@ -77,7 +77,7 @@ def getSummaries(csv, topGenres):
         else:
             g = g.strip()
             genresSep.append(g)
-    for i in range(0, len(genres)):
+    for i in range(0, len(genresSep)):
         for g in topGenres:
             if genresSep[i] == g:
                 topSummaries.append(summaries[i])
