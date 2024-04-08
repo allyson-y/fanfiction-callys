@@ -10,6 +10,7 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.model_selection import KFold, train_test_split
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics import confusion_matrix, accuracy_score
+from sklearn.cluster import KMeans
 import string
 
 from collections import Counter
@@ -20,6 +21,8 @@ from matplotlib import pyplot as plt
 import numpy as np
 from sklearn.cluster import KMeans
 from sklearn.manifold import TSNE
+from sklearn.decomposition import PCA
+from sklearn.datasets._samples_generator import make_blobs
 import seaborn as sns
 
 nltk.download('stopwords')
@@ -125,7 +128,7 @@ def getSummaries(csv, topGenres):
                 topSummaries.append(sum_genres.keys()[i])
     return topSummaries
 
-def clusterTopicVectors(fanfictions, n_topics=15):
+def clusterTopicVectors(fanfictions, n_topics=10):
     # topic model populated with documents from our reviews (with stopwords removed)
     n_docs = len(fanfictions)
 
@@ -159,6 +162,31 @@ def clusterTopicVectors(fanfictions, n_topics=15):
     
     return topic_distributions
 
+def graphClusters(topic_dist):
+    kmeans = KMeans(n_clusters=10, random_state=0, n_init="auto").fit(topic_dist)
+    y_kmeans = kmeans.predict(topic_dist)
+    
+    # Reduce dimensionality using PCA
+    pca = PCA(n_components=2)
+    reduced_topic_dist = pca.fit_transform(topic_dist)
+    
+    plt.scatter(reduced_topic_dist[:, 0], reduced_topic_dist[:, 1], c=y_kmeans, s=50, cmap='viridis')
+    centers = pca.transform(kmeans.cluster_centers_)  # Transform cluster centers to the reduced dimension space
+    plt.scatter(centers[:, 0], centers[:, 1], c='black', s=200, alpha=0.5)
+    plt.title("Cluster Plot of Topics")
+    # plt.xlabel("Principal Component 1")
+    # plt.ylabel("Principal Component 2")
+    plt.savefig('topicClusters.png')
+    plt.close()
+    # kmeans = KMeans(n_clusters=15, random_state=0, n_init="auto").fit(topic_dist)
+    # y_kmeans = kmeans.predict(topic_dist)
+    # plt.scatter(topic_dist[:, 0], topic_dist[:, 1], topic_dist[:, 2], c=y_kmeans, s=50, cmap='viridis')
+    # centers = kmeans.cluster_centers_
+    # plt.scatter(centers[:, 0], centers[:, 1], c='black', s=200, alpha=0.5)
+    # plt.savefig('topicClusters.png')
+    # plt.close()
+
+
 def genreProbabilities(fanfictions, genres):
     n_docs = len(fanfictions)
     n_genres = len(genres)
@@ -172,7 +200,6 @@ def genreProbabilities(fanfictions, genres):
             for j in range(n_genres):
                 if genres[j] in fanfictions["genre"][i]:
                     genre_distributions[i] = j
-                    print(j)
                     break
 
     return genre_distributions
@@ -222,6 +249,7 @@ def main():
     print("GENRE DISTRIBUTIONS") # num fan fiction rows x num genres
     print(genre_distributions)
     classify(topic_distributions, genre_distributions)
+    graphClusters(topic_distributions)
 
 
 if __name__ == "__main__":
